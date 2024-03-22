@@ -15,6 +15,13 @@ void setup(){
   
   output = createWriter("positions.txt");
   
+  try {
+    println(Serial.list()[0]);
+    myPort = new Serial(this, Serial.list()[0], 9600);
+  }catch(RuntimeException e) {
+    println("Error");
+  }
+  
 }
 
 void draw(){
@@ -89,6 +96,12 @@ void serialEvent(Serial myPort){
 void keyPressed(){
   if(key == ' '){
     motor = !motor;
+    String temp = Integer.toString(humidity);
+    if(motor){
+      temp += "1";
+    }else{
+      temp += "0";
+    }
   }else if(key == 'r' || key == 'R'){
       record = !record;
   }else if(key == ESC){
@@ -99,10 +112,22 @@ void keyPressed(){
     if(keyCode == UP){
       if(set_humidity < 90){
         set_humidity += 10;
+        String temp = Integer.toString(humidity);
+        if(motor){
+          temp += "1";
+        }else{
+          temp += "0";
+        }
       }
     }else if(keyCode == DOWN){
       if(set_humidity > 50){
         set_humidity -= 10;
+        String temp = Integer.toString(humidity);
+        if(motor){
+          temp += "1";
+        }else{
+          temp += "0";
+        }
       }
     }
     else if(keyCode == RETURN){
