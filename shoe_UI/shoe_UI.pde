@@ -1,6 +1,7 @@
 import processing.serial.*;
 
 Serial myPort;
+int port = 0;
 PrintWriter output;
 int humidity = 0;
 int set_humidity = 50;
@@ -16,13 +17,14 @@ void setup(){
   background(0x20);
   
   output = createWriter("positions.txt");
-  
+  /*
   try {
     println(Serial.list()[0]);
     myPort = new Serial(this, Serial.list()[0], 9600);
   }catch(RuntimeException e) {
     println("Error setup port 001");
   }
+  */
   
 }
 
@@ -74,19 +76,20 @@ void draw(){
       text("OFF", 670, 380);
     }
   }else if(page == 1){
+    set_position = 90;
     noStroke();
     fill(0x20);
     rect(0, 0, 700, 400, 0);
     
     fill(255, 255, 255);
     textSize(25);
-    text("Serial port :", 290, set_position);
+    text("Serial port :", 270, set_position);
     
     for(int i=0;i<Serial.list().length;i++){
+      set_position += 30;
       fill(255, 255, 255);
       textSize(18);
-      text(Serial.list()[i], 300, set_position);
-      set_position += 10;
+      text(Integer.toString(i+1)+"  "+Serial.list()[i], 300, set_position);
     }
   }
   
@@ -118,24 +121,44 @@ void keyPressed(){
     try{
       if(key == '1'){
         myPort = new Serial(this, Serial.list()[0], 9600);
+        println("port setup");
+        port = 1;
       }else if(key == '2'){
         myPort = new Serial(this, Serial.list()[1], 9600);
+        println("port setup");
+        port = 2;
       }else if(key == '3'){
         myPort = new Serial(this, Serial.list()[2], 9600);
+        println("port setup");
+        port = 3;
       }else if(key == '4'){
         myPort = new Serial(this, Serial.list()[3], 9600);
+        println("port setup");
+        port = 4;
       }else if(key == '5'){
         myPort = new Serial(this, Serial.list()[4], 9600);
+        println("port setup");
+        port = 5;
       }else if(key == '6'){
         myPort = new Serial(this, Serial.list()[5], 9600);
+        println("port setup");
+        port = 6;
       }else if(key == '7'){
         myPort = new Serial(this, Serial.list()[6], 9600);
+        println("port setup");
+        port = 7;
       }else if(key == '8'){
         myPort = new Serial(this, Serial.list()[7], 9600);
+        println("port setup");
+        port = 8;
       }
-      println("port setup");
     }catch(RuntimeException e){
-      println("Error setup port 002");
+      println(e);
+      if(port != 0 ){
+        println("Error setup port 001 : port already setup");
+      }else{
+        println("Error setup port 002");
+      }
     }
   }
   if(key == ' '){
