@@ -4,6 +4,8 @@ Serial myPort;
 PrintWriter output;
 int humidity = 0;
 int set_humidity = 50;
+int page = 0;
+int set_position = 90;
 Boolean motor = true;
 Boolean record = false;
 
@@ -19,12 +21,13 @@ void setup(){
     println(Serial.list()[0]);
     myPort = new Serial(this, Serial.list()[0], 9600);
   }catch(RuntimeException e) {
-    println("Error");
+    println("Error setup port 001");
   }
   
 }
 
 void draw(){
+  if(page == 0){
     noStroke();
     fill(0x20);
     rect(0, 0, 700, 400, 0);
@@ -62,18 +65,34 @@ void draw(){
     textSize(15);
     text("Record:", 620, 380);
     if(record){
-      fill(20, 30, 2);
+      fill(20, 60, 2);
       textSize(15);
       text("ON", 670, 380);
     }else{
-      fill(30, 20, 20);
+      fill(60, 20, 20);
       textSize(15);
       text("OFF", 670, 380);
     }
+  }else if(page == 1){
+    noStroke();
+    fill(0x20);
+    rect(0, 0, 700, 400, 0);
     
-    if(record){
-      output.println(Integer.toString(hour())+":"+Integer.toString(minute())+":"+Integer.toString(second())+" "+Integer.toString(humidity));
+    fill(255, 255, 255);
+    textSize(25);
+    text("Serial port :", 290, set_position);
+    
+    for(int i=0;i<Serial.list().length;i++){
+      fill(255, 255, 255);
+      textSize(18);
+      text(Serial.list()[i], 300, set_position);
+      set_position += 10;
     }
+  }
+  
+  if(record){
+    output.println(Integer.toString(hour())+":"+Integer.toString(minute())+":"+Integer.toString(second())+" "+Integer.toString(humidity));
+  }
 }
 
 void serialEvent(Serial myPort){
@@ -94,6 +113,31 @@ void serialEvent(Serial myPort){
 }
 
 void keyPressed(){
+  //println(key);
+  if(page == 1){
+    try{
+      if(key == '1'){
+        myPort = new Serial(this, Serial.list()[0], 9600);
+      }else if(key == '2'){
+        myPort = new Serial(this, Serial.list()[1], 9600);
+      }else if(key == '3'){
+        myPort = new Serial(this, Serial.list()[2], 9600);
+      }else if(key == '4'){
+        myPort = new Serial(this, Serial.list()[3], 9600);
+      }else if(key == '5'){
+        myPort = new Serial(this, Serial.list()[4], 9600);
+      }else if(key == '6'){
+        myPort = new Serial(this, Serial.list()[5], 9600);
+      }else if(key == '7'){
+        myPort = new Serial(this, Serial.list()[6], 9600);
+      }else if(key == '8'){
+        myPort = new Serial(this, Serial.list()[7], 9600);
+      }
+      println("port setup");
+    }catch(RuntimeException e){
+      println("Error setup port 002");
+    }
+  }
   if(key == ' '){
     motor = !motor;
     String temp = Integer.toString(humidity);
@@ -103,11 +147,14 @@ void keyPressed(){
       temp += "0";
     }
   }else if(key == 'r' || key == 'R'){
-      record = !record;
+    record = !record;
   }else if(key == ESC){
-      output.flush(); // Writes the remaining data to the file
-      output.close();
-      exit();
+    output.flush(); // Writes the remaining data to the file
+    output.close();
+    exit();
+  }else if(key == 'P' || key == 'p'){
+    page += 1;
+    page = page % 2;
   }else if(key == CODED){
     if(keyCode == UP){
       if(set_humidity < 90){
