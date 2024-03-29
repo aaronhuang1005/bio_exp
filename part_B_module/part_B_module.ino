@@ -8,6 +8,7 @@ Adafruit_HTU21DF htu = Adafruit_HTU21DF();
 
 float val_hum = 0; 
 int state = 0;
+int time_stamp = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -26,9 +27,10 @@ void setup() {
 
 void loop() {
     //float rel_hum = htu.readHumidity();
-    float rel_hum = 0;
+    int rel_hum = 50;
     if(Serial.available()){
       String s = Serial.readString();
+      //Serial.println(s);
       //String s = "123";
       s.trim();
       String set_hum = s.substring(0,s.indexOf('/'));
@@ -39,7 +41,11 @@ void loop() {
       //Serial.print("/");
       //Serial.println(state);
     }
-    Serial.println("0.0");
+    if(millis()-time_stamp>1000){
+      Serial.println(rel_hum);
+      time_stamp = millis();
+    }
+    
     if(state == 1){
       digitalWrite(A_1A,LOW);
       analogWrite(A_1B,255);
@@ -49,5 +55,4 @@ void loop() {
       analogWrite(A_1B,0);
       digitalWrite(13,LOW);
     }
-    delay(50);
 }

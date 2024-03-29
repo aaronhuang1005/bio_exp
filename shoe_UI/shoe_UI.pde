@@ -4,10 +4,13 @@ Serial myPort;
 int port = 0;
 PrintWriter output;
 int humidity = 0;
+int humidity_pre = 0;
+int time = 40;
+int shift = time;
 int set_humidity = 50;
 int page = 0;
 int set_position = 90;
-Boolean motor = true;
+Boolean motor = false;
 Boolean record = false;
 
 void setup(){
@@ -15,6 +18,13 @@ void setup(){
   windowResize(700, 400);
   frameRate(30);
   background(0x20);
+  
+  noStroke();
+  fill(0x25);
+  rect(20, 20, 500, 360, 7);
+  
+  stroke(255, 255, 255);
+  line(40, 342 , 480, 342);
   
   output = createWriter("positions.txt");
   /*
@@ -32,14 +42,10 @@ void draw(){
   if(page == 0){
     noStroke();
     fill(0x20);
-    rect(0, 0, 700, 400, 0);
-    
-    noStroke();
-    fill(0x25);
-    rect(20, 20, 500, 360, 7);
-    
+    rect(500, 0, 200, 400, 7);
+
     fill(255, 255, 255);
-    textSize(15);
+    textSize(15);                                               
     text("Setup Humidity", 560, 60);
     
     noStroke();
@@ -63,17 +69,49 @@ void draw(){
       text("OFF", 586, 285);
     }  
     
-    fill(0x30);
+    fill(0x60);
     textSize(15);
     text("Record:", 620, 380);
     if(record){
-      fill(20, 60, 2);
+      fill(50, 200, 50);
       textSize(15);
       text("ON", 670, 380);
     }else{
-      fill(60, 20, 20);
+      fill(200, 50, 50);
       textSize(15);
       text("OFF", 670, 380);
+    }
+
+    shift = time + 2;
+    noStroke();
+    fill(0x25);
+    quad(shift-1, 20 ,shift+30,20, shift+30,340, shift-1,340);
+    
+    fill(150, 255, 150);
+    textSize(15);
+    text(Integer.toString(humidity), shift + 1, 340 - 3*(humidity));
+    
+    stroke(150, 255, 150);
+    line(time, 340 - 3*(humidity_pre), shift, 340 - 3*(humidity));
+    humidity_pre = humidity;
+    time = shift;
+
+    
+    if(shift >= 480){
+      /*
+      noStroke();
+      fill(0x25);
+      rect(20, 20, 500, 360, 7);
+      
+      */
+      noStroke();
+      fill(0x25);
+      quad(shift-1, 20 ,shift+30,20, shift+30,341, shift-1,341);
+      
+      stroke(255, 255, 255);
+      line(40, 342 , 480, 342);
+      
+      time = 40;
     }
   }else if(page == 1){
     set_position = 90;
@@ -101,17 +139,17 @@ void draw(){
 void serialEvent(Serial myPort){
     try{
       String inString = myPort.readStringUntil('\n');
+      //println(inString);
       if (inString != null) 
       {
         inString = trim(inString);
         humidity = Integer.parseInt(inString);
+        if(humidity>110){
+          humidity = 100;
+        }
       }
     }catch(RuntimeException e) {
-      background(100,0,0);
-      fill(255, 255, 255);
-      textSize(80);
-      text("ERROR", 540, 320);
-      println("Error Null input");
+      println(e);
     }
 }
 
@@ -165,10 +203,11 @@ void keyPressed(){
     motor = !motor;
     String temp = Integer.toString(humidity);
     if(motor){
-      temp += "1";
+      temp += "/1!\n";
     }else{
-      temp += "0";
+      temp += "/0!\n";
     }
+    myPort.write(temp);
   }else if(key == 'r' || key == 'R'){
     record = !record;
   }else if(key == ESC){
@@ -178,26 +217,34 @@ void keyPressed(){
   }else if(key == 'P' || key == 'p'){
     page += 1;
     page = page % 2;
+    noStroke();
+    fill(0x25);
+    rect(20, 20, 500, 360, 7);
+    
+    stroke(255, 255, 255);
+    line(40, 342 , 480, 342);
   }else if(key == CODED){
     if(keyCode == UP){
       if(set_humidity < 90){
         set_humidity += 10;
         String temp = Integer.toString(humidity);
         if(motor){
-          temp += "1";
+          temp += "/1!\n";
         }else{
-          temp += "0";
+          temp += "/0!\n";
         }
+        myPort.write(temp);
       }
     }else if(keyCode == DOWN){
       if(set_humidity > 50){
         set_humidity -= 10;
         String temp = Integer.toString(humidity);
         if(motor){
-          temp += "1";
+          temp += "/1!\n";
         }else{
-          temp += "0";
+          temp += "/0!\n";
         }
+        myPort.write(temp);
       }
     }
     else if(keyCode == RETURN){
