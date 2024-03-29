@@ -39,7 +39,7 @@ void loop() {
       //Serial.print("/");
       //Serial.println(state);
     }
-    Serial.print(rel_hum);
+    Serial.println("0.0");
     if(state == 1){
       digitalWrite(A_1A,LOW);
       analogWrite(A_1B,255);
@@ -49,5 +49,5 @@ void loop() {
       analogWrite(A_1B,0);
       digitalWrite(13,LOW);
     }
-    
+    delay(50);
 }
