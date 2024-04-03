@@ -10,7 +10,9 @@ int shift = time;
 int set_humidity = 50;
 int page = 0;
 int set_position = 90;
+int bpm = 0;
 Boolean motor = false;
+Boolean state = false;
 Boolean record = false;
 
 void setup(){
@@ -42,50 +44,74 @@ void draw(){
   if(page == 0){
     noStroke();
     fill(0x20);
-    rect(500, 0, 200, 400, 7);
+    rect(520, 0, 180, 400, 7);
 
     fill(255, 255, 255);
     textSize(15);                                               
-    text("Setup Humidity", 560, 60);
+    text("Setup Humidity", 560, 40);
     
     noStroke();
-    fill(0x30);
-    rect(570, 70, 80, 80, 10);
+    if(!state){
+      fill(0x35);
+    }else{
+      fill(0x25);
+    }
+    rect(570, 50, 80, 80, 10);
     
     fill(255, 255, 255);
     textSize(30);
-    text(Integer.toString(set_humidity) + " %", 580, 120);
+    text(Integer.toString(set_humidity) + " %", 580, 100);
+    
+    fill(255, 255, 255);
+    textSize(15);                                               
+    text("BPS", 595, 160);
     
     noStroke();
-    fill(0x25);
-    rect(570, 235, 80, 80, 10);
+    if(state){
+      fill(0x35);
+    }else{
+      fill(0x25);
+    }
+    rect(570, 170, 80, 80, 10);
+    
+    fill(255, 255, 255);
+    textSize(30);
+    text(Integer.toString(bpm), 600, 220);
+    
+    noStroke();
+    if(state){
+      fill(0x35);
+    }else{
+      fill(0x25);
+    }
+    rect(570, 260, 80, 80, 10);
     if(motor){
       fill(0, 255, 0);
       textSize(30);
-      text("ON", 590, 285);
+      text("ON", 590, 310);
     }else{
       fill(255, 0, 0);
       textSize(30);
-      text("OFF", 586, 285);
+      text("OFF", 586, 310);
     }  
     
     fill(0x60);
     textSize(15);
-    text("Record:", 620, 380);
+    text("Record:", 575, 370);
     if(record){
       fill(50, 200, 50);
       textSize(15);
-      text("ON", 670, 380);
+      text("ON", 625, 370);
     }else{
       fill(200, 50, 50);
       textSize(15);
-      text("OFF", 670, 380);
+      text("OFF", 625, 370);
     }
 
     shift = time + 2;
     noStroke();
     fill(0x25);
-    quad(shift-1, 20 ,shift+30,20, shift+30,340, shift-1,340);
+    quad(shift-1, 20 ,shift+30,20, shift+30,341, shift-1,340);
     
     fill(150, 255, 150);
     textSize(15);
@@ -146,6 +172,8 @@ void serialEvent(Serial myPort){
         humidity = Integer.parseInt(inString);
         if(humidity>110){
           humidity = 100;
+        }else if(humidity<=0){
+          humidity = 0;
         }
       }
     }catch(RuntimeException e) {
@@ -191,7 +219,7 @@ void keyPressed(){
         port = 8;
       }
     }catch(RuntimeException e){
-      println(e);
+      //println(e);
       if(port != 0 ){
         println("Error setup port 001 : port already setup");
       }else{
@@ -200,15 +228,21 @@ void keyPressed(){
     }
   }
   if(key == ' '){
+    //println("space");
     motor = !motor;
-    String temp = Integer.toString(humidity);
+    String temp = Integer.toString(set_humidity)+"|"+Integer.toString(bpm);
     if(motor){
       temp += "/1!\n";
     }else{
       temp += "/0!\n";
     }
-    myPort.write(temp);
-  }else if(key == 'r' || key == 'R'){
+    if(port != 0){
+      myPort.write(temp);
+    }else{
+        println("Error setup port 002");
+    }
+    println(temp);
+  }else if(key == 'r' || key == 'R' || key == '\n'){
     record = !record;
   }else if(key == ESC){
     output.flush(); // Writes the remaining data to the file
@@ -225,30 +259,53 @@ void keyPressed(){
     line(40, 342 , 480, 342);
   }else if(key == CODED){
     if(keyCode == UP){
-      if(set_humidity < 90){
-        set_humidity += 10;
-        String temp = Integer.toString(humidity);
-        if(motor){
-          temp += "/1!\n";
-        }else{
-          temp += "/0!\n";
+      if(!state){
+        if(set_humidity < 90){
+          set_humidity += 10;
         }
-        myPort.write(temp);
+      }else{
+        if(bpm<9){
+          bpm += 1;
+        }
       }
+      String temp = Integer.toString(set_humidity)+"|"+Integer.toString(bpm);
+      if(motor){
+        temp += "/1!\n";
+      }else{
+        temp += "/0!\n";
+      }
+      if(port != 0){
+        myPort.write(temp);
+      }else{
+        println("Error setup port 002");
+      }
+      println(temp);
     }else if(keyCode == DOWN){
-      if(set_humidity > 50){
-        set_humidity -= 10;
-        String temp = Integer.toString(humidity);
-        if(motor){
-          temp += "/1!\n";
-        }else{
-          temp += "/0!\n";
+      if(!state){
+        if(set_humidity > 50){
+          set_humidity -= 10;
         }
-        myPort.write(temp);
+      }else{
+        if(bpm>0){
+          bpm -= 1;
+        }
       }
-    }
-    else if(keyCode == RETURN){
-      record = !record;
+      String temp = Integer.toString(set_humidity)+"|"+Integer.toString(bpm);
+      if(motor){
+        temp += "/1!\n";
+      }else{
+        temp += "/0!\n";
+      }
+      if(port != 0){
+        myPort.write(temp);
+      }else{
+        println("Error setup port 002");
+      }
+      println(temp);
+    }else if(keyCode == LEFT){
+      state = false;
+    }else if(keyCode == RIGHT){
+      state = true;
     }
   }
 }

@@ -9,6 +9,7 @@ Adafruit_HTU21DF htu = Adafruit_HTU21DF();
 float val_hum = 0; 
 int state = 0;
 int time_stamp = 0;
+int bps = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -33,11 +34,13 @@ void loop() {
       //Serial.println(s);
       //String s = "123";
       s.trim();
-      String set_hum = s.substring(0,s.indexOf('/'));
+      String set_hum = s.substring(0,s.indexOf('|'));
+      String set_bps = s.substring(s.indexOf('|')+1,s.indexOf('/'));
       String switcher = s.substring(s.indexOf('/')+1,s.indexOf('!'));
+      bps = set_bps.toInt();
       val_hum = set_hum.toFloat();
       state = switcher.toInt();
-      //Serial.print(val_hum);
+      //Serial.print(set_bps);
       //Serial.print("/");
       //Serial.println(state);
     }
