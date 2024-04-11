@@ -10,7 +10,7 @@ int shift = time;
 int set_humidity = 50;
 int page = 0;
 int set_position = 90;
-int bpm = 0;
+int bpm = 1;
 Boolean motor = false;
 Boolean state = false;
 Boolean record = false;
@@ -165,7 +165,7 @@ void draw(){
 void serialEvent(Serial myPort){
     try{
       String inString = myPort.readStringUntil('\n');
-      //println(inString);
+      println(inString);
       if (inString != null) 
       {
         inString = trim(inString);
@@ -264,7 +264,7 @@ void keyPressed(){
           set_humidity += 10;
         }
       }else{
-        if(bpm<9){
+        if(bpm<6){
           bpm += 1;
         }
       }
@@ -286,7 +286,7 @@ void keyPressed(){
           set_humidity -= 10;
         }
       }else{
-        if(bpm>0){
+        if(bpm>1){
           bpm -= 1;
         }
       }
