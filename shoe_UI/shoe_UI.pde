@@ -223,7 +223,8 @@ void keyPressed(){
       if(port != 0 ){
         println("Error setup port 001 : port already setup");
       }else{
-        println("Error setup port 002");
+        print_error();
+        //println("Error setup port 002");
       }
     }
   }
@@ -239,7 +240,8 @@ void keyPressed(){
     if(port != 0){
       myPort.write(temp);
     }else{
-        println("Error setup port 002");
+      print_error();
+      //println("Error setup port 002");
     }
     println(temp);
   }else if(key == 'r' || key == 'R' || key == '\n'){
@@ -277,7 +279,8 @@ void keyPressed(){
       if(port != 0){
         myPort.write(temp);
       }else{
-        println("Error setup port 002");
+        print_error();
+        //println("Error setup port 002");
       }
       println(temp);
     }else if(keyCode == DOWN){
@@ -299,7 +302,11 @@ void keyPressed(){
       if(port != 0){
         myPort.write(temp);
       }else{
-        println("Error setup port 002");
+        print_error();
+        //println("Error setup port 002");
+        //fill(255, 0, 0);
+        //textSize(20);
+        //text("Error setup port 002", 1, 1);
       }
       println(temp);
     }else if(keyCode == LEFT){
@@ -308,4 +315,11 @@ void keyPressed(){
       state = true;
     }
   }
+}
+
+void print_error(){
+  println("Error setup port 002");
+  fill(255, 0, 0);
+  textSize(15);
+  text("Error setup port 002", 5,13);
 }
