@@ -14,6 +14,7 @@ int bpm = 1;
 Boolean motor = false;
 Boolean state = false;
 Boolean record = false;
+int pre_sec = 0;
 
 void setup(){
   size(700, 400);
@@ -157,8 +158,9 @@ void draw(){
     }
   }
   
-  if(record){
+  if(record && second()!= pre_sec){
     output.println(Integer.toString(hour())+":"+Integer.toString(minute())+":"+Integer.toString(second())+" "+Integer.toString(humidity));
+    pre_sec = second();
   }
 }
 
